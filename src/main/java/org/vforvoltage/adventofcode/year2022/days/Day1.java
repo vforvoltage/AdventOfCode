@@ -12,10 +12,6 @@ public class Day1 extends Day2022 {
         super(1);
     }
 
-    public static void main(String[] args) {
-        new Day1().printParts();
-    }
-
     @Override
     public Object part1() {
         return getElfTotals().max().orElseThrow();
