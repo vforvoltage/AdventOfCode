@@ -1,4 +1,4 @@
-package org.vforvoltage.adventofcode;
+package org.vforvoltage.adventofcode.year2022;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,7 +12,7 @@ import org.vforvoltage.adventofcode.year2022.days.Day6;
 
 import java.util.stream.Stream;
 
-public class DaySolutionArgumentProvider implements ArgumentsProvider {
+public class DaySolutionArgumentProvider2022 implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
         return Stream.of(
