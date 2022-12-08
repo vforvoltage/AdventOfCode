@@ -24,8 +24,7 @@ public class Day1 extends Day2022 {
 
     private IntStream getElfTotals() {
         return Arrays.stream(getTodaysInput().split("\n\n"))
-                .map(s -> Arrays.stream(s.split("\n"))
-                        .mapToInt(Integer::parseInt))
+                .map(s -> s.lines().mapToInt(Integer::parseInt))
                 .mapToInt(IntStream::sum);
     }
 }
