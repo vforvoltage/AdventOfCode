@@ -11,6 +11,7 @@ import org.vforvoltage.adventofcode.year2022.days.Day5;
 import org.vforvoltage.adventofcode.year2022.days.Day6;
 import org.vforvoltage.adventofcode.year2022.days.Day7;
 import org.vforvoltage.adventofcode.year2022.days.Day8;
+import org.vforvoltage.adventofcode.year2022.days.Day9;
 
 import java.util.stream.Stream;
 
@@ -25,6 +26,7 @@ public class DaySolutionArgumentProvider2022 implements ArgumentsProvider {
                 Arguments.of(new Day5(), "PTWLTDSJV", "WZMFVGGZP"),
                 Arguments.of(new Day6(), 1647, 2447),
                 Arguments.of(new Day7(), 1723892L, 8474158L),
-                Arguments.of(new Day8(), 1672, 327180));
+                Arguments.of(new Day8(), 1672, 327180),
+                Arguments.of(new Day9(), 6271, 2458));
     }
 }
