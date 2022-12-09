@@ -2,8 +2,6 @@ package org.vforvoltage.adventofcode.year2022.days;
 
 import org.vforvoltage.adventofcode.year2022.Day2022;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class Day2 extends Day2022 {
     public Day2() {
         super(2);
@@ -11,37 +9,26 @@ public class Day2 extends Day2022 {
 
     @Override
     public Object part1() {
-        String input = getTodaysInput();
-
-        AtomicInteger myTotalScore = new AtomicInteger();
-        input.lines().forEach(game -> {
-            Roshambo me = getPiece(game.charAt(2));
-            Roshambo them = getPiece(game.charAt(0));
+        return getTodaysInput().lines().mapToInt(line -> {
+            Shape me = getPiece(line.charAt(2));
+            Shape them = getPiece(line.charAt(0));
             Outcome gameOutcome = me.getOutcomeAgainst(them);
-            int score = calculateScore(me, gameOutcome);
-            myTotalScore.addAndGet(score);
-        });
+            return calculateScore(me, gameOutcome);
+        }).sum();
 
-        return myTotalScore.get();
     }
 
     @Override
     public Object part2() {
-        String input = getTodaysInput();
-
-        AtomicInteger myTotalScore = new AtomicInteger();
-        input.lines().forEach(game -> {
-            Roshambo them = getPiece(game.charAt(0));
+        return getTodaysInput().lines().mapToInt(game -> {
+            Shape them = getPiece(game.charAt(0));
             Outcome gameOutcome = getOutcome(game.charAt(2));
-            Roshambo me = getPieceRequiredForResult(them, gameOutcome);
-            int score = calculateScore(me, gameOutcome);
-            myTotalScore.addAndGet(score);
-        });
-
-        return myTotalScore.get();
+            Shape me = getPieceRequiredForResult(them, gameOutcome);
+            return calculateScore(me, gameOutcome);
+        }).sum();
     }
 
-    private Roshambo getPieceRequiredForResult(Roshambo them, Outcome gameOutcome) {
+    private Shape getPieceRequiredForResult(Shape them, Outcome gameOutcome) {
         return switch (gameOutcome) {
             case DRAW -> them;
             case LOSE -> them.getWinsAgainst();
@@ -58,31 +45,31 @@ public class Day2 extends Day2022 {
         };
     }
 
-    private Roshambo getPiece(char inputCharacter) {
+    private Shape getPiece(char inputCharacter) {
         return switch (inputCharacter) {
-            case 'A', 'X' -> Roshambo.ROCK;
-            case 'B', 'Y' -> Roshambo.PAPER;
-            case 'C', 'Z' -> Roshambo.SCISSORS;
+            case 'A', 'X' -> Shape.ROCK;
+            case 'B', 'Y' -> Shape.PAPER;
+            case 'C', 'Z' -> Shape.SCISSORS;
             default -> throw new IllegalArgumentException("Can't handle input: %s".formatted(inputCharacter));
         };
     }
 
-    private int calculateScore(Roshambo me, Outcome gameOutcome) {
+    private int calculateScore(Shape me, Outcome gameOutcome) {
         return me.pointValue + gameOutcome.pointValue;
     }
 
-    private enum Roshambo {
+    private enum Shape {
         ROCK(1),
         PAPER(2),
         SCISSORS(3);
 
         public final int pointValue;
 
-        Roshambo(int pointValue) {
+        Shape(int pointValue) {
             this.pointValue = pointValue;
         }
 
-        Outcome getOutcomeAgainst(Roshambo opponent) {
+        Outcome getOutcomeAgainst(Shape opponent) {
             if (this.equals(opponent)) {
                 return Outcome.DRAW;
             } else if (this.winsAgainst(opponent)) {
@@ -90,11 +77,11 @@ public class Day2 extends Day2022 {
             } else return Outcome.LOSE;
         }
 
-        boolean winsAgainst(Roshambo opponent) {
+        boolean winsAgainst(Shape opponent) {
             return this.getWinsAgainst().equals(opponent);
         }
 
-        public Roshambo getWinsAgainst() {
+        public Shape getWinsAgainst() {
             return switch (this) {
                 case ROCK -> SCISSORS;
                 case PAPER -> ROCK;
@@ -102,7 +89,7 @@ public class Day2 extends Day2022 {
             };
         }
 
-        public Roshambo getLosesAgainst() {
+        public Shape getLosesAgainst() {
             return switch (this) {
                 case ROCK -> PAPER;
                 case PAPER -> SCISSORS;
