@@ -36,6 +36,37 @@ public class Day10 extends Day2022 {
 
     @Override
     public Object part2() {
-        return null;
+        String input = getTodaysInput();
+
+        int pixelPosition = 0;
+        int spritePosition = 1;
+        StringBuilder sb = new StringBuilder();
+        for (String line : input.split("\n")) {
+            if ((pixelPosition) % 40 == 0) {
+                sb.append("\n");
+                pixelPosition = 0;
+            }
+            if (spritePosition + 1 >= pixelPosition && spritePosition - 1 <= pixelPosition) {
+                sb.append("#");
+            } else {
+                sb.append(" ");
+            }
+            if (!line.equals("noop")) {
+                final String[] addx = line.split(" ");
+                pixelPosition++;
+                if ((pixelPosition) % 40 == 0) {
+                    sb.append("\n");
+                    pixelPosition = 0;
+                }
+                if (spritePosition + 1 >= pixelPosition && spritePosition - 1 <= pixelPosition) {
+                    sb.append("#");
+                } else {
+                    sb.append(" ");
+                }
+                spritePosition += Integer.parseInt(addx[1]);
+            }
+            pixelPosition++;
+        }
+        return sb.toString();
     }
 }

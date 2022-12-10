@@ -29,6 +29,13 @@ public class DaySolutionArgumentProvider2022 implements ArgumentsProvider {
                 Arguments.of(new Day7(), 1723892L, 8474158L),
                 Arguments.of(new Day8(), 1672, 327180),
                 Arguments.of(new Day9(), 6271, 2458),
-                Arguments.of(new Day10(), 15220, null));
+                Arguments.of(new Day10(), 15220, """
+
+                        ###  #### #### #### #  # ###  ####  ## \s
+                        #  # #       # #    # #  #  # #    #  #\s
+                        #  # ###    #  ###  ##   ###  ###  #  #\s
+                        ###  #     #   #    # #  #  # #    ####\s
+                        # #  #    #    #    # #  #  # #    #  #\s
+                        #  # #    #### #### #  # ###  #    #  #\s"""));
     }
 }
