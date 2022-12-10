@@ -4,6 +4,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.vforvoltage.adventofcode.year2022.days.Day1;
+import org.vforvoltage.adventofcode.year2022.days.Day10;
 import org.vforvoltage.adventofcode.year2022.days.Day2;
 import org.vforvoltage.adventofcode.year2022.days.Day3;
 import org.vforvoltage.adventofcode.year2022.days.Day4;
@@ -27,6 +28,7 @@ public class DaySolutionArgumentProvider2022 implements ArgumentsProvider {
                 Arguments.of(new Day6(), 1647, 2447),
                 Arguments.of(new Day7(), 1723892L, 8474158L),
                 Arguments.of(new Day8(), 1672, 327180),
-                Arguments.of(new Day9(), 6271, 2458));
+                Arguments.of(new Day9(), 6271, 2458),
+                Arguments.of(new Day10(), 15220, null));
     }
 }
