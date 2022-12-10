@@ -2,16 +2,9 @@ package org.vforvoltage.adventofcode.year2022.days;
 
 import org.vforvoltage.adventofcode.year2022.Day2022;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static java.lang.String.valueOf;
 import static java.util.stream.Collectors.groupingBy;
 
 public class Day3 extends Day2022 {
@@ -24,13 +17,14 @@ public class Day3 extends Day2022 {
     @Override
     public Object part1() {
         String input = getTodaysInput();
-        final IntStream intStream = input.lines().mapToInt(line -> {
-            String compartment1 = line.substring(0, (line.length() / 2));
-            String compartment2 = line.substring((line.length() / 2));
-            Character common = findCommonCharactersBetweenTwoStrings(compartment1, compartment2).stream().findFirst().orElseThrow();
-            return ALPHABET.indexOf(common);
-        });
-        return intStream.sum();
+        return input.lines()
+                .map(line -> {
+                    String s1 = line.substring(0, (line.length() / 2));
+                    String s2 = line.substring((line.length() / 2));
+                    return findCommonCharactersBetweenStrings(s1, s2);
+                })
+                .mapToInt(ALPHABET::indexOf)
+                .sum();
     }
 
     @Override
@@ -39,43 +33,24 @@ public class Day3 extends Day2022 {
         final int chunkSize = 3;
         final AtomicInteger counter = new AtomicInteger();
 
-        final Collection<List<String>> result = input.lines()
+        return input.lines()
                 .collect(groupingBy(s -> counter.getAndIncrement() / chunkSize))
-                .values();
-
-        final IntStream intStream = result.stream().mapToInt(group -> {
-            final Set<Character> commonCharactersBetweenStrings = findCommonCharactersBetweenStrings(group);
-            return ALPHABET.indexOf(commonCharactersBetweenStrings.stream().findFirst().orElseThrow());
-        });
-
-        return intStream.sum();
+                .values()
+                .stream()
+                .map(this::findCommonCharactersBetweenStrings)
+                .mapToInt(ALPHABET::indexOf)
+                .sum();
     }
 
-    private Set<Character> findCommonCharactersBetweenTwoStrings(String s1, String s2) {
-        Set<Character> commonCharacters = new HashSet<>();
-        for (char character : s1.toCharArray()) {
-            if (s2.contains(valueOf(character))) {
-                commonCharacters.add(character);
-            }
-        }
-        return commonCharacters;
+    private String findCommonCharactersBetweenStrings(List<String> strings) {
+        return strings.stream().reduce(ALPHABET, this::findCommonCharactersBetweenStrings);
     }
 
-    private Set<Character> findCommonCharactersBetweenStrings(List<String> strings) {
-        Set<Character> commonCharacters = strings.get(0).chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
-        for (int i = 1; i < strings.size(); i++) {
-
-            for(Iterator<Character> iterator = commonCharacters.iterator(); iterator.hasNext();) {
-                final Character next = iterator.next();
-                if(!strings.get(i).contains(String.valueOf(next))){
-                    iterator.remove();
-                }
-            }
-            commonCharacters.forEach(character -> {
-
-            });
-        }
-
-        return commonCharacters;
+    private String findCommonCharactersBetweenStrings(String s1, String s2) {
+        return s1.chars()
+                .filter(c1 -> s2.chars().anyMatch(c2 -> c1 == c2))
+                .distinct()
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
     }
 }
