@@ -1,5 +1,6 @@
 package org.vforvoltage.adventofcode.year2022.days;
 
+import org.vforvoltage.adventofcode.util.Grid;
 import org.vforvoltage.adventofcode.year2022.Day2022;
 
 import java.util.ArrayDeque;
@@ -13,115 +14,108 @@ public class Day12 extends Day2022 {
         super(12);
     }
 
-    private char[][] charArray;
-    private int[][] stepArray;
-
     @Override
     public Object part1() {
         String input = getTodaysInput();
 
-        charArray = convertInputToArray(input);
-        stepArray = new int[charArray.length][charArray[0].length];
-        GridPosition startPoint = findStartingPoint(charArray);
-        GridPosition endPoint = findEndPoint(charArray);
+        Grid<Character> characterGrid = convertInputToGrid(input);
+        Grid<Integer> stepGrid = new Grid<>(characterGrid.getSizes());
 
-        charArray[endPoint.row()][endPoint.column()] = 'z';
-        charArray[startPoint.row()][startPoint.column()] = 'a';
-        Deque<GridPosition> cellsToCheck = new ArrayDeque<>();
-        cellsToCheck.addLast(endPoint);
+        int[] startPoint = findStartPoint(characterGrid);
+        int[] endPoint = findEndPoint(characterGrid);
+
+        characterGrid.set('z', endPoint);
+        characterGrid.set('a', startPoint);
+
+        Deque<int[]> cellsToCheck = new ArrayDeque<>();
+        cellsToCheck.add(endPoint);
 
         while (!cellsToCheck.isEmpty()) {
-            final GridPosition nextCell = cellsToCheck.removeFirst();
-            cellsToCheck.addAll(findNextSpace(nextCell));
+            int[] nextCell = cellsToCheck.removeFirst();
+            cellsToCheck.addAll(findNextSpace(nextCell, characterGrid, stepGrid));
         }
-        return Integer.parseInt(String.valueOf(stepArray[startPoint.row][startPoint.column]));
+        return stepGrid.get(startPoint).orElseThrow();
     }
 
-    private Collection<GridPosition> findNextSpace(GridPosition cellToCheck) {
-        List<GridPosition> neighborCells = new ArrayList<>();
-        neighborCells.add(new GridPosition(cellToCheck.row() + 1, cellToCheck.column));
-        neighborCells.add(new GridPosition(cellToCheck.row() - 1, cellToCheck.column));
-        neighborCells.add(new GridPosition(cellToCheck.row(), cellToCheck.column + 1));
-        neighborCells.add(new GridPosition(cellToCheck.row(), cellToCheck.column - 1));
+    @Override
+    public Object part2() {
+        String input = getTodaysInput();
 
-        neighborCells = neighborCells.stream().filter(cell -> cell.row >= 0 && cell.column() >= 0 && cell.row() < stepArray.length && cell.column < stepArray[0].length && stepArray[cell.row()][cell.column] == 0).toList();
+        Grid<Character> characterGrid = convertInputToGrid(input);
+        Grid<Integer> stepGrid = new Grid<>(characterGrid.getSizes());
 
-        List<GridPosition> setCells = new ArrayList<>();
-        for (GridPosition cell : neighborCells) {
-            if (charArray[cell.row()][cell.column()] + 1 >= charArray[cellToCheck.row()][cellToCheck.column]) {
-                int nextStepValue = stepArray[cellToCheck.row()][cellToCheck.column] + 1;
-                stepArray[cell.row()][cell.column()] = nextStepValue;
+        int[] startPoint = findStartPoint(characterGrid);
+        int[] endPoint = findEndPoint(characterGrid);
+
+        characterGrid.set('z', endPoint);
+        characterGrid.set('a', startPoint);
+
+        Deque<int[]> cellsToCheck = new ArrayDeque<>();
+        cellsToCheck.add(endPoint);
+
+        while (!cellsToCheck.isEmpty()) {
+            int[] nextCell = cellsToCheck.removeFirst();
+            cellsToCheck.addAll(findNextSpace(nextCell, characterGrid, stepGrid));
+        }
+
+        List<int[]> aCells = new ArrayList<>();
+        for (int i = 0; i < characterGrid.getSizes()[0]; i++) {
+            for (int j = 0; j < characterGrid.getSizes()[1]; j++) {
+                if (characterGrid.get(i, j).orElseThrow() == 'a') {
+                    aCells.add(new int[]{i, j});
+                }
+            }
+        }
+        return aCells.stream().map(cell -> stepGrid.get(cell).orElse(0)).filter(x -> x > 0).sorted().findFirst().orElseThrow();
+    }
+
+    private Grid<Character> convertInputToGrid(String input) {
+        final String[] split = input.split("\n");
+        int numRows = split.length;
+        int numColumns = split[0].length();
+
+        Grid<Character> characterGrid = new Grid<>(numRows, numColumns);
+
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                characterGrid.set(split[i].charAt(j), i, j);
+            }
+        }
+        return characterGrid;
+    }
+
+    private Collection<? extends int[]> findNextSpace(int[] cellToCheck, Grid<Character> characterGrid, Grid<Integer> stepGrid) {
+        List<int[]> neighborCells = new ArrayList<>();
+        neighborCells.add(new int[]{cellToCheck[0] + 1, cellToCheck[1]});
+        neighborCells.add(new int[]{cellToCheck[0] - 1, cellToCheck[1]});
+        neighborCells.add(new int[]{cellToCheck[0], cellToCheck[1] + 1});
+        neighborCells.add(new int[]{cellToCheck[0], cellToCheck[1] - 1});
+
+        neighborCells = neighborCells.stream()
+                .filter(cell ->
+                        cell[0] >= 0 &&
+                                cell[1] >= 0 &&
+                                cell[0] < stepGrid.getSizes()[0] &&
+                                cell[1] < stepGrid.getSizes()[1] &&
+                                stepGrid.get(cell).orElse(0) == 0)
+                .toList();
+
+        List<int[]> setCells = new ArrayList<>();
+        for (int[] cell : neighborCells) {
+            if (characterGrid.get(cell).orElseThrow() + 1 >= characterGrid.get(cellToCheck).orElseThrow()) {
+                int nextStepValue = stepGrid.get(cellToCheck).orElse(0) + 1;
+                stepGrid.set(nextStepValue, cell);
                 setCells.add(cell);
             }
         }
         return setCells;
     }
 
-    @Override
-    public Object part2() {
-
-        String input = getTodaysInput();
-
-        charArray = convertInputToArray(input);
-        stepArray = new int[charArray.length][charArray[0].length];
-        GridPosition startPoint = findStartingPoint(charArray);
-        GridPosition endPoint = findEndPoint(charArray);
-
-        charArray[endPoint.row()][endPoint.column()] = 'z';
-        charArray[startPoint.row()][startPoint.column()] = 'a';
-        Deque<GridPosition> cellsToCheck = new ArrayDeque<>();
-        cellsToCheck.addLast(endPoint);
-
-        while (!cellsToCheck.isEmpty() /*&& stepArray[startPoint.row()][endPoint.column()] == 0*/) {
-            final GridPosition nextCell = cellsToCheck.removeFirst();
-            cellsToCheck.addAll(findNextSpace(nextCell));
-        }
-
-        List<GridPosition> aCells = new ArrayList<>();
-        for (int i = 0; i < stepArray.length; i++) {
-            for (int j = 0; j < stepArray[0].length; j++) {
-                if (charArray[i][j] == 'a') {
-                    aCells.add(new GridPosition(i, j));
-                }
-            }
-        }
-
-        return aCells.stream().map(gridPosition -> Integer.parseInt(String.valueOf(stepArray[gridPosition.row][gridPosition.column]))).filter(x -> x > 0).sorted().toList().get(0);
+    private int[] findStartPoint(Grid<Character> characterGrid) {
+        return characterGrid.findValue('S');
     }
 
-    private char[][] convertInputToArray(String input) {
-        final String[] split = input.split("\n");
-        int numRows = split.length;
-        int numColumns = split[0].length();
-        char[][] chars = new char[numRows][numColumns];
-
-        for (int i = 0; i < numRows; i++) {
-            for (int j = 0; j < numColumns; j++) {
-                chars[i][j] = split[i].charAt(j);
-            }
-        }
-        return chars;
-    }
-
-    private GridPosition findStartingPoint(char[][] charArray) {
-        return findCharacter(charArray, 'S');
-    }
-
-    private GridPosition findEndPoint(char[][] charArray) {
-        return findCharacter(charArray, 'E');
-    }
-
-    private GridPosition findCharacter(char[][] charArray, char find) {
-        for (int row = 0; row < charArray.length; row++) {
-            for (int column = 0; column < charArray[0].length; column++) {
-                if (charArray[row][column] == find) {
-                    return new GridPosition(row, column);
-                }
-            }
-        }
-        throw new IllegalStateException();
-    }
-
-    private record GridPosition(int row, int column) {
+    private int[] findEndPoint(Grid<Character> characterGrid) {
+        return characterGrid.findValue('E');
     }
 }
