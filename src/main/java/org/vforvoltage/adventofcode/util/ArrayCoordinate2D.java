@@ -8,6 +8,8 @@ public class ArrayCoordinate2D {
     private int column;
 
     public ArrayCoordinate2D() {
+        this.row = 0;
+        this.column = 0;
     }
 
     public ArrayCoordinate2D(int row, int column) {

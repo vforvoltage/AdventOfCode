@@ -8,6 +8,8 @@ public class OffsetArrayCoordinate2D {
     private ArrayCoordinate2D offset;
 
     public OffsetArrayCoordinate2D() {
+        this.coordinate = new ArrayCoordinate2D();
+        this.offset = new ArrayCoordinate2D();
     }
 
     public ArrayCoordinate2D getOffset() {
@@ -45,7 +47,6 @@ public class OffsetArrayCoordinate2D {
 
         public OffsetArrayCoordinate2DBuilder() {
             this.coordinate = new OffsetArrayCoordinate2D();
-            this.coordinate.coordinate = new ArrayCoordinate2D();
         }
 
         public OffsetArrayCoordinate2DBuilder withRow(int row) {
