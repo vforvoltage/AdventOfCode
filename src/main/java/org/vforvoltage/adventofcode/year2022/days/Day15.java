@@ -6,6 +6,7 @@ import org.vforvoltage.adventofcode.util.OffsetArrayCoordinate2D;
 import org.vforvoltage.adventofcode.util.OffsetArrayCoordinate2D.OffsetArrayCoordinate2DBuilder;
 import org.vforvoltage.adventofcode.year2022.Day2022;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -38,9 +39,45 @@ public class Day15 extends Day2022 {
 
     @Override
     public Object part2() {
+        String input = getTodaysInput();
+        final List<Pair<OffsetArrayCoordinate2D, OffsetArrayCoordinate2D>> pairs = input.lines().map(this::mapStringToPairOfCoordinates).toList();
 
 
+        for (Pair<OffsetArrayCoordinate2D, OffsetArrayCoordinate2D> sensorBeaconPair : pairs) {
+            int distanceBetweenSensorAndBeacon = findDistanceBetweenPoints(sensorBeaconPair.getLeft(), sensorBeaconPair.getRight());
+            List<OffsetArrayCoordinate2D> borderCells = getBorderCells(sensorBeaconPair.getLeft(), distanceBetweenSensorAndBeacon + 1);
+            borderCells = borderCells.stream().filter(coord -> coord.getRow() >= 0 && coord.getRow() <= 4000000 && coord.getColumn() >= 0 && coord.getColumn() <= 4000000).toList();
+            for (OffsetArrayCoordinate2D borderCell : borderCells) {
+                final boolean isOutOfRangeOfAllSensors = pairs.stream().allMatch(pair -> {
+                    final long checkDistance = findDistanceBetweenPoints(pair);
+                    final long distanceBetweenSensorAndCheckSpot = findDistanceBetweenPoints(borderCell, pair.getLeft());
+                    return distanceBetweenSensorAndCheckSpot > checkDistance;
+                });
+                if (isOutOfRangeOfAllSensors) {
+                    return ((long) borderCell.getColumn() * 4000000L) + (long) borderCell.getRow();
+                }
+            }
+        }
         return null;
+    }
+
+    private List<OffsetArrayCoordinate2D> getBorderCells(OffsetArrayCoordinate2D coordinate, int distance) {
+        List<OffsetArrayCoordinate2D> borderCells = new ArrayList<>();
+
+        for (int i = -distance; i <= distance; i++) {
+            borderCells.add(new OffsetArrayCoordinate2DBuilder().withRow(coordinate.getRow() + (distance - Math.abs(i))).withColumn(coordinate.getColumn() + i).build());
+            borderCells.add(new OffsetArrayCoordinate2DBuilder().withRow(coordinate.getRow() - (distance - Math.abs(i))).withColumn(coordinate.getColumn() + i).build());
+        }
+
+        return borderCells;
+    }
+
+    private int findDistanceBetweenPoints(Pair<OffsetArrayCoordinate2D, OffsetArrayCoordinate2D> pair) {
+        return findDistanceBetweenPoints(pair.getLeft(), pair.getRight());
+    }
+
+    private int findDistanceBetweenPoints(OffsetArrayCoordinate2D left, OffsetArrayCoordinate2D right) {
+        return Math.abs(left.getRow() - right.getRow()) + Math.abs(left.getColumn() - right.getColumn());
     }
 
     private Pair<Integer, Integer> getUnavailableCellsForRow(Pair<OffsetArrayCoordinate2D, OffsetArrayCoordinate2D> pair, int row) {
