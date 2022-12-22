@@ -1,5 +1,6 @@
 package org.vforvoltage.adventofcode.year2022.days;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vforvoltage.adventofcode.year2022.Day2022;
@@ -58,7 +59,53 @@ public class Day16 extends Day2022 {
 
     @Override
     public Object part2() {
-        return null;
+        String input = getTodaysInput();
+
+        ValveGraph valveGraph = generateValveGraph(input);
+        List<Valve> valvesToOpen = getValvesToOpen(valveGraph);
+        valvesToOpen.add(valveGraph.getValve("AA"));
+        Map<String, Map<String, Deque<String>>> paths = buildPathMap(valvesToOpen, valveGraph);
+
+        valvesToOpen.remove(valveGraph.getValve("AA"));
+        List<Deque<Valve>> pathOptions = new ArrayList<>();
+        List<Valve> lessValves = valvesToOpen.stream().limit(99).collect(Collectors.toList());
+        getPathOptions(lessValves, new ArrayDeque<>(), pathOptions, 26, paths);
+
+        List<Pair<Deque<Valve>, Integer>> pathValues = new ArrayList<>();
+        int pathsChecked = 0;
+        for (int i = 0; i < pathOptions.size(); i++) {
+            Deque<Valve> path = new ArrayDeque<>(pathOptions.get(i));
+            path.addFirst(valveGraph.getValve("AA"));
+            final Pair<Integer, StringBuilder> pressureReleasedByPath = getPressureReleasedByPath(path, paths, 26, valveGraph);
+            pathValues.add(Pair.of(pathOptions.get(i), pressureReleasedByPath.getLeft()));
+            pathsChecked++;
+        }
+
+        pathValues = pathValues.stream()
+                .sorted(Comparator.comparing(Pair::getRight))
+                .collect(Collectors.toList());
+
+        int max = 0;
+        for (int i = pathValues.size() - 1; i >= 1; i--) {
+            Pair<Deque<Valve>, Integer> pathValue1 = pathValues.get(i);
+            if (pathValue1.getRight() + pathValues.get(i - 1).getRight() < max) {
+                break;
+            }
+            for (int j = i - 1; j >= 0; j--) {
+                Pair<Deque<Valve>, Integer> pathValue2 = pathValues.get(j);
+                if (pathValue1.getRight() + pathValue2.getRight() < max) {
+                    break;
+                }
+                if (!CollectionUtils.containsAny(pathValue1.getLeft(), pathValue2.getLeft())) {
+                    int total = pathValue1.getRight() + pathValue2.getRight();
+                    if (total > max) {
+                        max = total;
+                    }
+                    break;
+                }
+            }
+        }
+        return max;
     }
 
     private Pair<Integer, StringBuilder> getPressureReleasedByPath(Deque<Valve> chosenPath, Map<String, Map<String, Deque<String>>> pathsBetweenValves, int totalMinutes, ValveGraph valveGraph) {
@@ -66,7 +113,7 @@ public class Day16 extends Day2022 {
         int totalPressureReleased = 0;
         int openPressureValvesTotal = 0;
         Valve currentValve = chosenPath.removeFirst();
-        Valve targetValve = chosenPath.removeFirst();//currentValve;
+        Valve targetValve = chosenPath.removeFirst();
         Deque<String> valvesToVisit = new ArrayDeque<>(pathsBetweenValves.get(currentValve.getName()).get(targetValve.getName()));
         valvesToVisit.removeFirst();
         List<Valve> openValves = new ArrayList<>();
