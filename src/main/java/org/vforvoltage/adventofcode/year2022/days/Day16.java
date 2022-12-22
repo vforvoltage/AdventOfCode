@@ -50,11 +50,15 @@ public class Day16 extends Day2022 {
                 maxPressureReleased = pressureReleasedFromPath;
                 System.out.println(pressureReleasedByPath.getRight());
             }
-//            maxPressureReleased = Math.max(maxPressureReleased, pressureReleasedFromPath);
             pathsChecked++;
         }
 
         return maxPressureReleased;
+    }
+
+    @Override
+    public Object part2() {
+        return null;
     }
 
     private Pair<Integer, StringBuilder> getPressureReleasedByPath(Deque<Valve> chosenPath, Map<String, Map<String, Deque<String>>> pathsBetweenValves, int totalMinutes, ValveGraph valveGraph) {
@@ -205,11 +209,6 @@ public class Day16 extends Day2022 {
         }
 
         return pathSoFar;
-    }
-
-    @Override
-    public Object part2() {
-        return null;
     }
 
     private static class Valve {
